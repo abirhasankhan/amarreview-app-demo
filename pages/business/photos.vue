@@ -1,0 +1,12 @@
+<template>
+  <BusinessLayout>
+    <div class="space-y-6">
+      <h1 class="text-2xl font-semibold">Photo Gallery</h1>
+      <PhotoGallery :business-id="businessId" />
+    </div>
+  </BusinessLayout>
+</template>
+
+<script setup>
+const businessId = '123' // Replace with actual business ID
+</script>
