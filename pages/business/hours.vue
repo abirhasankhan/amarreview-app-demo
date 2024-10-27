@@ -1,33 +1,74 @@
 <template>
   <BusinessLayout>
     <div class="space-y-6">
-      <h1 class="text-2xl font-semibold">Business Hours</h1>
-      <CustomHours
-        :initial-hours="businessHours"
-        @update="updateBusinessHours"
-      />
+      <div v-if="loading" class="text-center py-12">
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-4 border-emerald-600 border-t-transparent mx-auto"
+        ></div>
+        <p class="mt-4 text-gray-600">Loading business hours...</p>
+      </div>
+
+      <div
+        v-else-if="error"
+        class="bg-red-50 border border-red-200 rounded-lg p-6"
+      >
+        <p class="text-red-600">{{ error }}</p>
+      </div>
+
+      <template v-else>
+        <h1 class="text-2xl font-semibold">Business Hours</h1>
+        <CustomHours
+          :initial-hours="businessHours"
+          @update="updateBusinessHours"
+        />
+      </template>
     </div>
   </BusinessLayout>
 </template>
 
 <script setup>
-// Mock business hours
-const businessHours = ref({
-  Monday: { open: '09:00', close: '17:00', closed: false },
-  Tuesday: { open: '09:00', close: '17:00', closed: false },
-  Wednesday: { open: '09:00', close: '17:00', closed: false },
-  Thursday: { open: '09:00', close: '17:00', closed: false },
-  Friday: { open: '09:00', close: '17:00', closed: false },
-  Saturday: { open: '10:00', close: '15:00', closed: false },
-  Sunday: { open: '', close: '', closed: true }
-})
+const {
+  business,
+  loading,
+  error,
+  fetchBusiness,
+  updateBusinessHours: updateHours,
+} = useBusiness();
+const user = useSupabaseUser();
 
-const updateBusinessHours = async (newHours) => {
-  try {
-    // Update hours in the database
-    businessHours.value = newHours
-  } catch (error) {
-    console.error('Error updating business hours:', error)
+// Format business hours
+const businessHours = computed(() => {
+  if (!business.value?.business_hours) return {};
+
+  return business.value.business_hours.reduce((acc, hour) => {
+    acc[hour.day] = {
+      open: hour.open_time,
+      close: hour.close_time,
+      closed: hour.is_closed,
+    };
+    return acc;
+  }, {});
+});
+
+const updateBusinessHours = async (hours) => {
+  if (business.value) {
+    await updateHours(business.value.id, hours);
   }
-}
+};
+
+// Fetch business data on mount
+onMounted(async () => {
+  if (user.value) {
+    const client = useSupabaseClient();
+    const { data } = await client
+      .from("businesses")
+      .select("id")
+      .eq("owner_id", user.value.id)
+      .single();
+
+    if (data) {
+      await fetchBusiness(data.id);
+    }
+  }
+});
 </script>

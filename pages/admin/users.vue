@@ -30,27 +30,46 @@
         </div>
       </div>
 
+      <div v-if="loading" class="text-center py-12">
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-4 border-emerald-600 border-t-transparent mx-auto"
+        ></div>
+        <p class="mt-4 text-gray-600">Loading users...</p>
+      </div>
+
       <!-- Users Table -->
-      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div v-else class="bg-white rounded-lg shadow-sm overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 User
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Role
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Status
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Reviews
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Joined
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Actions
               </th>
             </tr>
@@ -60,12 +79,17 @@
               <td class="px-6 py-4">
                 <div class="flex items-center">
                   <img
-                    :src="user.avatar"
-                    :alt="user.name"
+                    :src="
+                      user.avatar_url ||
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`
+                    "
+                    :alt="user.full_name"
                     class="w-8 h-8 rounded-full"
                   />
                   <div class="ml-3">
-                    <div class="font-medium text-gray-900">{{ user.name }}</div>
+                    <div class="font-medium text-gray-900">
+                      {{ user.full_name }}
+                    </div>
                     <div class="text-sm text-gray-500">{{ user.email }}</div>
                   </div>
                 </div>
@@ -83,17 +107,17 @@
                   class="px-2 py-1 text-xs font-medium rounded-full"
                   :class="{
                     'bg-green-100 text-green-800': user.status === 'active',
-                    'bg-red-100 text-red-800': user.status === 'suspended'
+                    'bg-red-100 text-red-800': user.status === 'suspended',
                   }"
                 >
                   {{ user.status }}
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
-                {{ user.reviewCount }}
+                {{ user.review_count }}
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
-                {{ formatDate(user.joinedAt) }}
+                {{ formatDate(user.created_at) }}
               </td>
               <td class="px-6 py-4 text-sm">
                 <button
@@ -125,7 +149,8 @@
       <!-- Pagination -->
       <div class="flex justify-between items-center">
         <div class="text-sm text-gray-500">
-          Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ totalUsers }} users
+          Showing {{ startIndex + 1 }} to {{ endIndex }} of
+          {{ totalUsers }} users
         </div>
         <div class="flex gap-2">
           <button
@@ -155,32 +180,42 @@
         <div class="p-6">
           <div class="flex justify-between items-start mb-6">
             <h2 class="text-xl font-semibold">Edit User</h2>
-            <button @click="selectedUser = null" class="text-gray-400 hover:text-gray-600">
+            <button
+              @click="selectedUser = null"
+              class="text-gray-400 hover:text-gray-600"
+            >
               ✕
             </button>
           </div>
 
           <form @submit.prevent="updateUser" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Name</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Name</label
+              >
               <input
-                v-model="editForm.name"
+                v-model="editForm.full_name"
                 type="text"
                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Email</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Email</label
+              >
               <input
                 v-model="editForm.email"
                 type="email"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                disabled
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50"
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Role</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Role</label
+              >
               <select
                 v-model="editForm.role"
                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
@@ -201,9 +236,10 @@
               </button>
               <button
                 type="submit"
-                class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
+                :disabled="isSubmitting"
+                class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50"
               >
-                Save Changes
+                {{ isSubmitting ? "Saving..." : "Save Changes" }}
               </button>
             </div>
           </form>
@@ -214,141 +250,170 @@
 </template>
 
 <script setup>
+const client = useSupabaseClient();
+const currentPage = ref(1);
+const itemsPerPage = 10;
+const selectedUser = ref(null);
+const loading = ref(true);
+const isSubmitting = ref(false);
+
 const filters = ref({
-  role: '',
-  status: '',
-  search: ''
-})
+  role: "",
+  status: "",
+  search: "",
+});
 
-const currentPage = ref(1)
-const itemsPerPage = 10
-const selectedUser = ref(null)
 const editForm = ref({
-  name: '',
-  email: '',
-  role: ''
-})
+  full_name: "",
+  email: "",
+  role: "",
+});
 
-// Mock users data
-const users = ref([
-  {
-    id: 1,
-    name: 'John Smith',
-    email: 'john@example.com',
-    role: 'user',
-    status: 'active',
-    reviewCount: 15,
-    joinedAt: '2024-01-15T10:00:00Z',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John'
-  },
-  {
-    id: 2,
-    name: 'Sarah Johnson',
-    email: 'sarah@example.com',
-    role: 'business_owner',
-    status: 'active',
-    reviewCount: 8,
-    joinedAt: '2024-02-20T14:30:00Z',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
-  },
-  {
-    id: 3,
-    name: 'Mike Wilson',
-    email: 'mike@example.com',
-    role: 'admin',
-    status: 'active',
-    reviewCount: 42,
-    joinedAt: '2023-12-01T09:15:00Z',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike'
-  },
-  // Add more mock users...
-])
+const users = ref([]);
+
+// Fetch users from Supabase
+const fetchUsers = async () => {
+  try {
+    loading.value = true;
+    let query = client
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (filters.value.role) {
+      query = query.eq("role", filters.value.role);
+    }
+
+    if (filters.value.status) {
+      query = query.eq("status", filters.value.status);
+    }
+
+    if (filters.value.search) {
+      query = query.or(
+        `full_name.ilike.%${filters.value.search}%,email.ilike.%${filters.value.search}%`
+      );
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    users.value = data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  } finally {
+    loading.value = false;
+  }
+};
 
 // Filter and paginate users
-const filteredUsers = computed(() => {
-  return users.value.filter(user => {
-    const matchesRole = !filters.value.role || user.role === filters.value.role
-    const matchesStatus = !filters.value.status || user.status === filters.value.status
-    const matchesSearch = !filters.value.search || 
-      user.name.toLowerCase().includes(filters.value.search.toLowerCase()) ||
-      user.email.toLowerCase().includes(filters.value.search.toLowerCase())
-    return matchesRole && matchesStatus && matchesSearch
-  })
-})
-
-const totalUsers = computed(() => filteredUsers.value.length)
-const totalPages = computed(() => Math.ceil(totalUsers.value / itemsPerPage))
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage)
-const endIndex = computed(() => Math.min(startIndex.value + itemsPerPage, totalUsers.value))
+const filteredUsers = computed(() => users.value);
+const totalUsers = computed(() => filteredUsers.value.length);
+const totalPages = computed(() => Math.ceil(totalUsers.value / itemsPerPage));
+const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage);
+const endIndex = computed(() =>
+  Math.min(startIndex.value + itemsPerPage, totalUsers.value)
+);
 const paginatedUsers = computed(() => {
-  return filteredUsers.value.slice(startIndex.value, endIndex.value)
-})
+  return filteredUsers.value.slice(startIndex.value, endIndex.value);
+});
 
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
 const getRoleClass = (role) => {
   const classes = {
-    admin: 'bg-purple-100 text-purple-800',
-    business_owner: 'bg-blue-100 text-blue-800',
-    user: 'bg-gray-100 text-gray-800'
-  }
-  return classes[role]
-}
+    admin: "bg-purple-100 text-purple-800",
+    business_owner: "bg-blue-100 text-blue-800",
+    user: "bg-gray-100 text-gray-800",
+  };
+  return classes[role];
+};
 
 const formatRole = (role) => {
   const labels = {
-    admin: 'Admin',
-    business_owner: 'Business Owner',
-    user: 'User'
-  }
-  return labels[role]
-}
+    admin: "Admin",
+    business_owner: "Business Owner",
+    user: "User",
+  };
+  return labels[role];
+};
 
 const editUser = (user) => {
-  selectedUser.value = user
+  selectedUser.value = user;
   editForm.value = {
-    name: user.name,
+    full_name: user.full_name,
     email: user.email,
-    role: user.role
-  }
-}
+    role: user.role,
+  };
+};
 
 const updateUser = async () => {
   try {
-    const user = users.value.find(u => u.id === selectedUser.value.id)
-    Object.assign(user, editForm.value)
-    selectedUser.value = null
+    isSubmitting.value = true;
+    const { error } = await client
+      .from("profiles")
+      .update({
+        full_name: editForm.value.full_name,
+        role: editForm.value.role,
+      })
+      .eq("id", selectedUser.value.id);
+
+    if (error) throw error;
+
+    await fetchUsers();
+    selectedUser.value = null;
   } catch (error) {
-    console.error('Error updating user:', error)
+    console.error("Error updating user:", error);
+  } finally {
+    isSubmitting.value = false;
   }
-}
+};
 
 const suspendUser = async (user) => {
-  if (!confirm(`Are you sure you want to suspend ${user.name}?`)) return
-  
+  if (!confirm(`Are you sure you want to suspend ${user.full_name}?`)) return;
+
   try {
-    user.status = 'suspended'
+    const { error } = await client
+      .from("profiles")
+      .update({ status: "suspended" })
+      .eq("id", user.id);
+
+    if (error) throw error;
+
+    await fetchUsers();
   } catch (error) {
-    console.error('Error suspending user:', error)
+    console.error("Error suspending user:", error);
   }
-}
+};
 
 const activateUser = async (user) => {
   try {
-    user.status = 'active'
+    const { error } = await client
+      .from("profiles")
+      .update({ status: "active" })
+      .eq("id", user.id);
+
+    if (error) throw error;
+
+    await fetchUsers();
   } catch (error) {
-    console.error('Error activating user:', error)
+    console.error("Error activating user:", error);
   }
-}
+};
 
 // Reset to first page when filters change
 watch(filters, () => {
-  currentPage.value = 1
-})
+  currentPage.value = 1;
+  fetchUsers();
+});
+
+// Initial data fetch
+onMounted(async () => {
+  await fetchUsers();
+});
 </script>
