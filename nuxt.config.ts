@@ -15,6 +15,11 @@ export default defineNuxtConfig({
       callback: "/auth/confirm",
       exclude: ["/", "/business/*", "/blog/*", "/businesses/*"],
     },
+    cookieOptions: {
+      maxAge: 60 * 60 * 8, // 8 hours
+      sameSite: "lax",
+      secure: true,
+    },
   },
   content: {
     highlight: {

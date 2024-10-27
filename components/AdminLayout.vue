@@ -5,7 +5,9 @@
         <div class="flex justify-between h-16">
           <div class="flex">
             <NuxtLink to="/admin" class="flex items-center">
-              <span class="text-xl font-bold text-emerald-600">Admin Dashboard</span>
+              <span class="text-xl font-bold text-emerald-600"
+                >Admin Dashboard</span
+              >
             </NuxtLink>
           </div>
           <div class="flex items-center">
@@ -44,34 +46,39 @@
 <script setup>
 const navigationItems = [
   {
-    name: 'Dashboard',
-    path: '/admin',
-    icon: '📊'
+    name: "Dashboard",
+    path: "/admin",
+    icon: "📊",
   },
   {
-    name: 'Business Claims',
-    path: '/admin/claims',
-    icon: '🏢'
+    name: "Business Claims",
+    path: "/admin/claims",
+    icon: "🏢",
   },
   {
-    name: 'Content Moderation',
-    path: '/admin/moderation',
-    icon: '📝'
+    name: "Businesses",
+    path: "/admin/businesses",
+    icon: "🏢",
   },
   {
-    name: 'User Management',
-    path: '/admin/users',
-    icon: '👥'
+    name: "Content Moderation",
+    path: "/admin/moderation",
+    icon: "📝",
   },
   {
-    name: 'Categories',
-    path: '/admin/categories',
-    icon: '📁'
+    name: "User Management",
+    path: "/admin/users",
+    icon: "👥",
   },
   {
-    name: 'Settings',
-    path: '/admin/settings',
-    icon: '⚙️'
-  }
-]
+    name: "Categories",
+    path: "/admin/categories",
+    icon: "📁",
+  },
+  {
+    name: "Settings",
+    path: "/admin/settings",
+    icon: "⚙️",
+  },
+];
 </script>

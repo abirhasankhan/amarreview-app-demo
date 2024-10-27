@@ -62,93 +62,93 @@
 
 <script setup>
 definePageMeta({
-  //middleware: 'admin'
-})
+  //middleware: "admin",
+});
 
 // Mock statistics
 const stats = ref({
   totalUsers: 1234,
   totalReviews: 5678,
   pendingClaims: 23,
-  reportedContent: 15
-})
+  reportedContent: 15,
+});
 
 // Mock recent activity
 const recentActivity = ref([
   {
     id: 1,
-    type: 'review',
-    user: 'John Doe',
-    action: 'posted a new review',
-    target: 'Green Garden Restaurant',
-    time: '5 minutes ago'
+    type: "review",
+    user: "John Doe",
+    action: "posted a new review",
+    target: "Green Garden Restaurant",
+    time: "5 minutes ago",
   },
   {
     id: 2,
-    type: 'claim',
-    user: 'Sarah Smith',
-    action: 'submitted a business claim for',
-    target: 'Tech Solutions Pro',
-    time: '15 minutes ago'
+    type: "claim",
+    user: "Sarah Smith",
+    action: "submitted a business claim for",
+    target: "Tech Solutions Pro",
+    time: "15 minutes ago",
   },
   {
     id: 3,
-    type: 'report',
-    user: 'Mike Johnson',
-    action: 'reported a review on',
-    target: 'City Cafe',
-    time: '1 hour ago'
-  }
-])
+    type: "report",
+    user: "Mike Johnson",
+    action: "reported a review on",
+    target: "City Cafe",
+    time: "1 hour ago",
+  },
+]);
 
 // Quick actions
 const quickActions = ref([
   {
-    id: 'review-claims',
-    title: 'Review Claims',
-    description: 'Process pending business claims',
-    icon: '🏢',
-    color: 'bg-blue-50 text-blue-700'
+    id: "review-claims",
+    title: "Review Claims",
+    description: "Process pending business claims",
+    icon: "🏢",
+    color: "bg-blue-50 text-blue-700",
   },
   {
-    id: 'moderate-reviews',
-    title: 'Moderate Reviews',
-    description: 'Review reported content',
-    icon: '📝',
-    color: 'bg-yellow-50 text-yellow-700'
+    id: "moderate-reviews",
+    title: "Moderate Reviews",
+    description: "Review reported content",
+    icon: "📝",
+    color: "bg-yellow-50 text-yellow-700",
   },
   {
-    id: 'manage-users',
-    title: 'Manage Users',
-    description: 'View and manage user accounts',
-    icon: '👥',
-    color: 'bg-green-50 text-green-700'
+    id: "manage-users",
+    title: "Manage Users",
+    description: "View and manage user accounts",
+    icon: "👥",
+    color: "bg-green-50 text-green-700",
   },
   {
-    id: 'system-settings',
-    title: 'Settings',
-    description: 'Configure system settings',
-    icon: '⚙️',
-    color: 'bg-purple-50 text-purple-700'
-  }
-])
+    id: "system-settings",
+    title: "Settings",
+    description: "Configure system settings",
+    icon: "⚙️",
+    color: "bg-purple-50 text-purple-700",
+  },
+]);
 
-const router = useRouter()
+const router = useRouter();
 
 const handleQuickAction = (actionId) => {
   switch (actionId) {
-    case 'review-claims':
-      router.push('/admin/claims')
-      break
-    case 'moderate-reviews':
-      router.push('/admin/moderation')
-      break
-    case 'manage-users':
-      router.push('/admin/users')
-      break
-    case 'system-settings':
-      router.push('/admin/settings')
-      break
+    case "review-claims":
+      router.push("/admin/claims");
+      break;
+    case "moderate-reviews":
+      router.push("/admin/moderation");
+      break;
+    case "manage-users":
+      router.push("/admin/users");
+      break;
+    case "system-settings":
+      router.push("/admin/settings");
+      break;
   }
-}
+};
 </script>

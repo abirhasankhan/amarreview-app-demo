@@ -1,10 +1,12 @@
 <template>
   <div class="max-w-md mx-auto">
     <h1 class="text-3xl font-bold text-center mb-8">Sign In</h1>
-    
+
     <form @submit.prevent="handleLogin" class="space-y-6">
       <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <label for="email" class="block text-sm font-medium text-gray-700"
+          >Email</label
+        >
         <input
           id="email"
           v-model="email"
@@ -15,7 +17,9 @@
       </div>
 
       <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <label for="password" class="block text-sm font-medium text-gray-700"
+          >Password</label
+        >
         <input
           id="password"
           v-model="password"
@@ -40,7 +44,10 @@
     <div class="mt-6">
       <p class="text-center text-sm text-gray-600">
         Don't have an account?
-        <NuxtLink to="/auth/register" class="text-emerald-600 hover:text-emerald-500">
+        <NuxtLink
+          to="/auth/register"
+          class="text-emerald-600 hover:text-emerald-500"
+        >
           Sign up
         </NuxtLink>
       </p>
@@ -49,26 +56,26 @@
 </template>
 
 <script setup>
-const client = useSupabaseClient()
-const router = useRouter()
+const client = useSupabaseClient();
+const router = useRouter();
 
-const email = ref('')
-const password = ref('')
-const error = ref(null)
+const email = ref("");
+const password = ref("");
+const error = ref(null);
 
 const handleLogin = async () => {
   try {
-    error.value = null
+    error.value = null;
     const { error: authError } = await client.auth.signInWithPassword({
       email: email.value,
-      password: password.value
-    })
+      password: password.value,
+    });
 
-    if (authError) throw authError
+    if (authError) throw authError;
 
-    router.push('/dashboard')
+    router.push("/admin");
   } catch (e) {
-    error.value = e.message
+    error.value = e.message;
   }
-}
+};
 </script>

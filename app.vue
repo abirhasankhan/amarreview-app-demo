@@ -7,3 +7,12 @@
     <TheFooter />
   </div>
 </template>
+
+<script setup>
+// Initialize auth on app mount
+const { refreshSession } = useAuth();
+
+onMounted(async () => {
+  await refreshSession();
+});
+</script>
