@@ -267,3 +267,9 @@ create policy "Businesses are manageable by admins and owners"
   );
 
 -- Add more policies as needed for other tables
+-- Add verification_method column to business_claims table
+alter table business_claims add column if not exists verification_method text check (verification_method in ('document', 'facebook'));
+alter table business_claims add column if not exists facebook_post_url text;
+
+-- Add index for verification method
+create index if not exists idx_business_claims_verification_method on business_claims(verification_method);

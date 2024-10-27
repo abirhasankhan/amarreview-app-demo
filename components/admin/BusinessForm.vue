@@ -42,7 +42,6 @@
           <textarea
             v-model="form.description"
             rows="3"
-            required
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
           ></textarea>
         </div>
@@ -67,7 +66,6 @@
           <input
             v-model="form.image"
             type="url"
-            required
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -83,7 +81,6 @@
           <input
             v-model="form.phone"
             type="tel"
-            required
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -93,7 +90,6 @@
           <input
             v-model="form.email"
             type="email"
-            required
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -120,7 +116,6 @@
           <input
             v-model="form.address"
             type="text"
-            required
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -154,7 +149,6 @@
           <input
             v-model="form.postal_code"
             type="text"
-            required
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
