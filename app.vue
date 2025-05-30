@@ -3,13 +3,14 @@
     <TheHeader />
     <main class="container mx-auto px-4 py-8">
       <NuxtPage />
+      <NotificationProvider />
     </main>
     <TheFooter />
   </div>
 </template>
 
 <script setup>
-// Initialize auth on app mount
+import NotificationProvider from '~/components/NotificationProvider.vue';// Initialize auth on app mount
 const { refreshSession } = useAuth();
 
 onMounted(async () => {

@@ -73,7 +73,7 @@ const handleLogin = async () => {
 
     if (authError) throw authError;
 
-    router.push("/admin");
+    router.push("/dashboard");
   } catch (e) {
     error.value = e.message;
   }
