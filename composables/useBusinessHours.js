@@ -1,55 +1,50 @@
+import { ref } from 'vue';
+import { useApi } from './useApi';
+
 export const useBusinessHours = () => {
-    const supabase = useSupabaseClient()
+    const { get, post, put, del } = useApi();
+
+    const loading = ref(false);
+    const error = ref(null);
+
+    const handleFetch = async (fn) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            return await fn();
+        } catch (err) {
+            error.value = err.data?.message || err.message || 'An error occurred';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
 
     const getBusinessHours = async (businessId) => {
-        try {
-            const data = await $fetch(`/api/business-hours/${businessId}`)
-            return Array.isArray(data?.data) ? data.data : []
-        } catch (error) {
-            console.error('Error fetching business hours:', error)
-            return []
-        }
-    }
+        return handleFetch(async () => {
+            const data = await get(`/business-hours/${businessId}`);
+            return Array.isArray(data?.data) ? data.data : [];
+        });
+    };
 
     const createBusinessHours = async (payload) => {
-        try {
-            return await $fetch('/api/business-hours', {
-                method: 'POST',
-                body: payload
-            })
-        } catch (error) {
-            console.error('Error creating business hours:', error)
-            throw new Error(error.data?.message || 'Failed to create hours')
-        }
-    }
+        return handleFetch(() => post('/business-hours', payload));
+    };
 
     const updateBusinessHours = async (id, payload) => {
-        try {
-            return await $fetch(`/api/business-hours/${id}`, {
-                method: 'PUT',
-                body: payload
-            })
-        } catch (error) {
-            console.error('Error updating business hours:', error)
-            throw new Error(error.data?.message || 'Failed to update hours')
-        }
-    }
+        return handleFetch(() => put(`/business-hours/${id}`, payload));
+    };
 
     const deleteBusinessHours = async (id) => {
-        try {
-            return await $fetch(`/api/business-hours/${id}`, {
-                method: 'DELETE'
-            })
-        } catch (error) {
-            console.error('Error deleting business hours:', error)
-            throw new Error(error.data?.message || 'Failed to delete hours')
-        }
-    }
+        return handleFetch(() => del(`/business-hours/${id}`));
+    };
 
     return {
+        loading,
+        error,
         getBusinessHours,
         createBusinessHours,
         updateBusinessHours,
         deleteBusinessHours
-    }
-  }
+    };
+};

@@ -1,19 +1,27 @@
 import { ref } from "vue";
+import { useApi } from "./useApi"; // adjust path if needed
 
 export const useCategories = () => {
+	const { get, post, put, del } = useApi();
+
 	const categories = ref([]);
 	const category = ref(null);
 	const loading = ref(false);
 	const error = ref(null);
 
+	const clearError = () => {
+		error.value = null;
+	};
+
 	// Fetch all categories
 	const fetchCategories = async () => {
 		loading.value = true;
-		error.value = null;
+		clearError();
 		try {
-			categories.value = await $fetch("/api/categories");
+			categories.value = await get("/categories");
+			return categories.value;
 		} catch (err) {
-			error.value = err.data?.message || "Failed to fetch categories";
+			error.value = err?.message || "Failed to fetch categories";
 			throw err;
 		} finally {
 			loading.value = false;
@@ -23,40 +31,29 @@ export const useCategories = () => {
 	// Fetch single category by slug (with businesses)
 	const fetchCategoryBySlug = async (slug) => {
 		loading.value = true;
-		error.value = null;
+		clearError();
 		try {
-			const response = await $fetch(`/api/categories/slug/${slug}`, {
-				onResponseError({ response }) {
-					console.error('API Error Response:', {
-						status: response.status,
-						data: response._data
-					})
-				}
-			})
-			category.value = response
-			return response
+			const response = await get(`/categories/slug/${slug}`);
+			category.value = response;
+			return response;
 		} catch (err) {
-			error.value = err.data?.message || `Error loading "${slug}" category`
-			console.error('Fetch Error Details:', {
-				url: err.url,
-				status: err.statusCode,
-				message: err.data?.message,
-				error: err.data
-			})
-			throw err
+			error.value = err?.message || `Error loading "${slug}" category`;
+			console.error('Fetch Error Details:', err);
+			throw err;
 		} finally {
-			loading.value = false
+			loading.value = false;
 		}
-	}
+	};
 
 	// Fetch single category by id
 	const fetchCategoryById = async (id) => {
 		loading.value = true;
-		error.value = null;
+		clearError();
 		try {
-			category.value = await $fetch(`/api/categories/${id}`);
+			category.value = await get(`/categories/${id}`);
+			return category.value;
 		} catch (err) {
-			error.value = err.data?.message || "Category not found";
+			error.value = err?.message || "Category not found";
 			throw err;
 		} finally {
 			loading.value = false;
@@ -66,16 +63,13 @@ export const useCategories = () => {
 	// Create new category
 	const createCategory = async (categoryData) => {
 		loading.value = true;
-		error.value = null;
+		clearError();
 		try {
-			const newCategory = await $fetch("/api/categories", {
-				method: "POST",
-				body: categoryData
-			});
+			const newCategory = await post("/categories", categoryData);
 			categories.value = [newCategory, ...categories.value];
 			return newCategory;
 		} catch (err) {
-			error.value = err.data?.message || "Failed to create category";
+			error.value = err?.message || "Failed to create category";
 			throw err;
 		} finally {
 			loading.value = false;
@@ -85,13 +79,10 @@ export const useCategories = () => {
 	// Update existing category
 	const updateCategory = async (id, updates) => {
 		loading.value = true;
-		error.value = null;
+		clearError();
 		try {
-			const updatedCategory = await $fetch(`/api/categories/${id}`, {
-				method: "PUT",
-				body: updates
-			});
-			categories.value = categories.value.map(c =>
+			const updatedCategory = await put(`/categories/${id}`, updates);
+			categories.value = categories.value.map((c) =>
 				c.id === updatedCategory.id ? updatedCategory : c
 			);
 			if (category.value?.id === updatedCategory.id) {
@@ -99,7 +90,7 @@ export const useCategories = () => {
 			}
 			return updatedCategory;
 		} catch (err) {
-			error.value = err.data?.message || "Failed to update category";
+			error.value = err?.message || "Failed to update category";
 			throw err;
 		} finally {
 			loading.value = false;
@@ -109,23 +100,20 @@ export const useCategories = () => {
 	// Delete category
 	const deleteCategory = async (id) => {
 		loading.value = true;
-		error.value = null;
+		clearError();
 		try {
-			await $fetch(`/api/categories/${id}`, {
-				method: "DELETE"
-			});
-			categories.value = categories.value.filter(c => c.id !== id);
+			await del(`/categories/${id}`);
+			categories.value = categories.value.filter((c) => c.id !== id);
 			if (category.value?.id === id) {
 				category.value = null;
 			}
 		} catch (err) {
-			error.value = err.data?.message || "Failed to delete category";
+			error.value = err?.message || "Failed to delete category";
 			throw err;
 		} finally {
 			loading.value = false;
 		}
 	};
-
 
 	return {
 		categories,

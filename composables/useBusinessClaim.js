@@ -1,7 +1,9 @@
-// composables/useBusinessClaim.js
 import { ref } from 'vue';
+import { useApi } from './useApi';
 
 export const useBusinessClaim = () => {
+    const { get, post } = useApi();
+
     const states = {
         isSubmitting: ref(false),
         isCreatingBusiness: ref(false),
@@ -12,70 +14,59 @@ export const useBusinessClaim = () => {
         businesses: ref([])
     };
 
-    const createBusiness = async (businessData) => {
-        states.isCreatingBusiness.value = true;
+    // Generic fetch handler
+    const handleFetch = async (fn, loadingRef) => {
+        loadingRef.value = true;
+        states.error.value = null;
         try {
-            return await $fetch("/api/businesses", {
-                method: "POST",
-                body: businessData
-            });
+            return await fn();
         } catch (e) {
-            states.error.value = e.message || "Failed to create business";
+            states.error.value = e.data?.message || e.message || "An error occurred";
             throw e;
         } finally {
-            states.isCreatingBusiness.value = false;
+            loadingRef.value = false;
         }
+    };
+
+    const createBusiness = async (businessData) => {
+        return handleFetch(async () => {
+            const newBusiness = await post('/businesses', businessData);
+            return newBusiness;
+        }, states.isCreatingBusiness);
     };
 
     const submitClaim = async (businessId, role, verificationFile) => {
-        states.isSubmittingClaim.value = true;
-        states.error.value = null;
-
-        try {
+        return handleFetch(async () => {
             const formData = new FormData();
-            formData.append("business_id", businessId.toString());
-            formData.append("role", role);
-
+            formData.append('business_id', businessId.toString());
+            formData.append('role', role);
             if (verificationFile) {
-                formData.append("file", verificationFile);
+                formData.append('file', verificationFile);
             }
-
-            await $fetch("/api/businesses/claims", {
-                method: "POST",
+            // Using raw fetch here because post() from useApi may not handle FormData correctly
+            const response = await fetch(`${useRuntimeConfig().public.apiBase}/businesses/claims`, {
+                method: 'POST',
                 body: formData,
             });
-
-            states.submitted.value = true;
-        } catch (e) {
-            let message = "Failed to submit claim.";
-
-            // Check for 409 Conflict (already claimed)
-            if (e?.response?.status === 409) {
-                message = e.response._data?.message || "You have already claimed this business.";
+            if (!response.ok) {
+                if (response.status === 409) {
+                    const errorData = await response.json();
+                    throw { data: { message: errorData.message || 'You have already claimed this business.' }, response };
+                }
+                throw new Error('Failed to submit claim.');
             }
-
-            states.error.value = message;
-
-            // Optional: show notification if you're using one
-            // showNotification(message, 'error');
-
-            throw new Error(message); // allow UI-level handler to catch it too
-        } finally {
-            states.isSubmittingClaim.value = false;
-        }
+            states.submitted.value = true;
+        }, states.isSubmittingClaim);
     };
-    
-    
 
     const handleSubmit = async (selectedBusiness, formData) => {
         states.isSubmitting.value = true;
         states.error.value = null;
-
         try {
             let businessId = selectedBusiness?.id;
 
             if (!businessId) {
-                const { id } = await createBusiness({
+                const newBusiness = await createBusiness({
                     name: formData.businessName,
                     description: formData.description,
                     address: formData.address,
@@ -88,34 +79,25 @@ export const useBusinessClaim = () => {
                     website: formData.website,
                     category_id: formData.categoryId,
                 });
-                businessId = id;
+                businessId = newBusiness.id;
             }
 
             await submitClaim(businessId, formData.role, formData.verificationFile);
 
         } catch (e) {
-            states.error.value = e.message || "An error occurred during submission.";
+            states.error.value = e.data?.message || e.message || "An error occurred during submission.";
         } finally {
             states.isSubmitting.value = false;
         }
     };
 
-
     const fetchBusinessesWithClaims = async () => {
-        states.isFetchingBusinesses.value = true;
-        states.error.value = null;
-        try {
-            const data = await $fetch("/api/businesses/claims");
+        return handleFetch(async () => {
+            const data = await get('/businesses/claims');
             states.businesses.value = data;
             return data;
-        } catch (e) {
-            states.error.value = e.message || "Failed to fetch businesses and claims";
-            throw e;
-        } finally {
-            states.isFetchingBusinesses.value = false;
-        }
+        }, states.isFetchingBusinesses);
     };
-
 
     const reset = () => {
         states.isSubmitting.value = false;

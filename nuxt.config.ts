@@ -20,8 +20,15 @@ export default defineNuxtConfig({
 			callback: "/auth/confirm",
 			exclude: ["/", "/business/*", "/blog/*", "/businesses/*"],
 		},
+		clientOptions: {
+			auth: {
+				persistSession: true,
+				autoRefreshToken: true,
+				detectSessionInUrl: true,
+			},
+		},
 		cookieOptions: {
-			maxAge: 60 * 60 * 8, // 8 hours
+			maxAge: 60 * 60 * 8,
 			sameSite: "lax",
 			secure: true,
 		},
@@ -34,7 +41,7 @@ export default defineNuxtConfig({
 	plugins: ["~/plugins/notification.js"],
 	app: {
 		head: {
-			title: "AmarReview - Only trusted source of real reviews for Bangladeshi Businesses",
+			title: "AmarReview - Frontend",
 			meta: [
 				{ charset: "utf-8" },
 				{
@@ -44,13 +51,12 @@ export default defineNuxtConfig({
 			],
 		},
 	},
-
 	runtimeConfig: {
-		// Private keys (server-side)
-		// apiSecret: process.env.NUXT_API_SECRET,
-
-		// Public keys (exposed to the client)
 		public: {
+			apiBase:
+				process.env.NODE_ENV === "development"
+					? `https://amar-review-app-8umkt.ondigitalocean.app/api` // Backend dev port
+					: `${process.env.BACKEND_URL}/api`,
 			supabaseUrl: process.env.SUPABASE_URL,
 			supabaseKey: process.env.SUPABASE_KEY,
 		},
