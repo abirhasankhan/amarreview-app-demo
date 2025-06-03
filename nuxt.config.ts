@@ -30,7 +30,7 @@ export default defineNuxtConfig({
 		cookieOptions: {
 			maxAge: 60 * 60 * 8,
 			sameSite: "lax",
-			secure: true,
+			secure: process.env.NODE_ENV !== "development", // Only require secure in production
 		},
 	},
 	content: {
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
 			theme: "github-light",
 		},
 	},
-	plugins: ["~/plugins/notification.js"],
+	plugins: ["~/plugins/notification.js", "~/plugins/auth.ts"],
 	app: {
 		head: {
 			title: "AmarReview - Frontend",
@@ -55,7 +55,7 @@ export default defineNuxtConfig({
 		public: {
 			apiBase:
 				process.env.NODE_ENV === "development"
-					? `https://amar-review-app-8umkt.ondigitalocean.app/api` // Backend dev port
+					? `http://localhost:3000/api` // Backend dev port
 					: `${process.env.BACKEND_URL}/api`,
 			supabaseUrl: process.env.SUPABASE_URL,
 			supabaseKey: process.env.SUPABASE_KEY,

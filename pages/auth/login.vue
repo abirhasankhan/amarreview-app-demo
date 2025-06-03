@@ -58,6 +58,7 @@
 <script setup>
 const client = useSupabaseClient();
 const router = useRouter();
+const { refreshSession } = useAuth(); // Add this line
 
 const email = ref("");
 const password = ref("");
@@ -72,7 +73,10 @@ const handleLogin = async () => {
     });
 
     if (authError) throw authError;
-
+    
+    // Refresh the auth session to update the store
+    await refreshSession();
+    
     router.push("/dashboard");
   } catch (e) {
     error.value = e.message;
