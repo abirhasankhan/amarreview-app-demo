@@ -1,7 +1,10 @@
 export default defineNuxtConfig({
 	compatibilityDate: "2024-04-03",
+
 	devtools: { enabled: true },
+
 	css: ["~/assets/css/tailwind.css"],
+
 	modules: [
 		"@nuxtjs/tailwindcss",
 		"@nuxtjs/supabase",
@@ -10,10 +13,10 @@ export default defineNuxtConfig({
 		"@nuxt/content",
 		"@nuxt/icon",
 	],
+
 	supabase: {
 		url: process.env.SUPABASE_URL,
-		key: process.env.SUPABASE_KEY,
-		serviceKey: process.env.SUPABASE_SERVICE_KEY,
+		key: process.env.SUPABASE_KEY, // ✅ Only use anon key on frontend
 		redirect: false,
 		redirectOptions: {
 			login: "/auth/login",
@@ -30,15 +33,18 @@ export default defineNuxtConfig({
 		cookieOptions: {
 			maxAge: 60 * 60 * 8,
 			sameSite: "lax",
-			secure: process.env.NODE_ENV !== "development", // Only require secure in production
+			secure: process.env.NODE_ENV !== "development", // Secure cookies in production
 		},
 	},
+
 	content: {
 		highlight: {
 			theme: "github-light",
 		},
 	},
+
 	plugins: ["~/plugins/notification.js", "~/plugins/auth.ts"],
+
 	app: {
 		head: {
 			title: "AmarReview - Frontend",
@@ -51,12 +57,13 @@ export default defineNuxtConfig({
 			],
 		},
 	},
+
 	runtimeConfig: {
 		public: {
 			apiBase:
 				process.env.NODE_ENV === "development"
-					? `http://localhost:3000/api` // Backend dev port
-					: `${process.env.BACKEND_URL}/api`,
+					? "http://localhost:3000/api" // Backend dev URL
+					: `${process.env.BACKEND_URL}/api`, // Live backend
 			supabaseUrl: process.env.SUPABASE_URL,
 			supabaseKey: process.env.SUPABASE_KEY,
 		},

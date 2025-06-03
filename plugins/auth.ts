@@ -1,78 +1,78 @@
 import { defineNuxtPlugin } from "#app";
 
-export default defineNuxtPlugin(async (nuxtApp) => {
-  const client = useSupabaseClient();
-  const user = useSupabaseUser();
-  const router = useRouter();
-  const route = useRoute();
+export default defineNuxtPlugin(async () => {
+	const client = useSupabaseClient();
+	const user = useSupabaseUser();
+	const router = useRouter();
+	const route = useRoute();
 
-  // Initialize auth state
-  const initializeAuth = async () => {
-    try {
-      const {
-        data: { session },
-        error,
-      } = await client.auth.getSession();
-      if (error) throw error;
+	const initializeAuth = async () => {
+		try {
+			const {
+				data: { session },
+				error,
+			} = await client.auth.getSession();
+			if (error) throw error;
 
-      if (session) {
-        user.value = session.user;
+			if (session) {
+				user.value = session.user;
 
-        const { data: profile } = await client
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .single();
+				const { data: profile, error: profileError } = await client
+					.from("profiles")
+					.select("role")
+					.eq("id", session.user.id)
+					.single();
 
-        if (profile && process.client) {
-          sessionStorage.setItem("userRole", profile.role);
-        }
+				if (profileError) throw profileError;
 
-        return { session, profile };
-      }
+				if (profile && process.client) {
+					sessionStorage.setItem("userRole", profile.role);
+				}
 
-      return null;
-    } catch (error) {
-      console.error("Auth initialization error:", error);
-      user.value = null;
-      if (process.client) {
-        sessionStorage.removeItem("userRole");
-      }
-      return null;
-    }
-  };
+				return { session, profile };
+			}
 
-  // Handle auth state changes only on client side
-  if (process.client) {
-    client.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        if (session) {
-          user.value = session.user;
-          await initializeAuth();
+			return null;
+		} catch (err) {
+			console.error("[Auth Init Error]", err);
+			user.value = null;
+			if (process.client) sessionStorage.removeItem("userRole");
+			return null;
+		}
+	};
 
-          if (route.path.startsWith("/auth/")) {
-            router.push("/dashboard");
-          }
-        }
-      } else if (event === "SIGNED_OUT" || event === "USER_DELETED") {
-        user.value = null;
-        sessionStorage.removeItem("userRole");
-        router.push("/auth/login");
-      }
-    });
-  }
+	if (process.client) {
+		client.auth.onAuthStateChange(async (event, session) => {
+			switch (event) {
+				case "SIGNED_IN":
+				case "TOKEN_REFRESHED":
+					if (session) {
+						user.value = session.user;
+						await initializeAuth();
+						if (route.path.startsWith("/auth/")) {
+							router.push("/dashboard");
+						}
+					}
+					break;
+				case "SIGNED_OUT":
+				case "USER_DELETED":
+					user.value = null;
+					sessionStorage.removeItem("userRole");
+					router.push("/auth/login");
+					break;
+			}
+		});
+	}
 
-  // Initialize auth state
-  const authState = await initializeAuth();
+	const authState = await initializeAuth();
 
-  // Provide auth state
-  return {
-    provide: {
-      auth: {
-        user,
-        session: authState?.session,
-        profile: authState?.profile,
-      },
-    },
-  };
+	return {
+		provide: {
+			auth: {
+				user,
+				session: authState?.session,
+				profile: authState?.profile,
+			},
+		},
+	};
 });
